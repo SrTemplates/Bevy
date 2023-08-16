@@ -1,0 +1,15 @@
+[template]
+cargo_generate_version = ">=0.9.0"
+exclude = ["*.png", ".github/workflows/ci.yml"]
+
+[hooks]
+post = ["post-script.rhai"]
+
+[placeholders]
+game_name = { type = "string", prompt = "👾 What will be the name of this game? (For Humans)" }
+platform = { type = "string", prompt = "🖥️ Which platforms we will support?", choices = [
+    "all",
+    "mobile",
+    "web",
+    "pc",
+], default = "all" }

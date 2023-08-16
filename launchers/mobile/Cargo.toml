@@ -1,0 +1,13 @@
+[package]
+name = "mobile_{{crate_name}}"
+version = "0.1.0"
+edition = "2021"
+workspace = "../../"
+
+[lib]
+name = "game"
+crate-type = ["staticlib", "cdylib"]
+
+[dependencies]
+bevy.workspace = true
+game.path = "../../"

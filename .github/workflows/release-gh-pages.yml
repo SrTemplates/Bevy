@@ -1,0 +1,82 @@
+name: Release WASM (GitHub Pages)
+
+permissions:
+  contents: write
+
+on:
+  push:
+    paths-ignore:
+      - ".github/build.yml"
+      - ".github/release-**.yml"
+      - "**/Makefile.toml"
+      - "README.md"
+    tags:
+      - "*"
+
+env:
+  APP_NAME: {{crate_name}}
+  PUBLIC_URL: /replace_that/
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v3
+      - name: Load .env file
+        uses: xom9ikk/dotenv@v2
+      - uses: dsherret/rust-toolchain-file@v1
+      - uses: Swatinem/rust-cache@v2
+      - name: Setup | Trunk
+        uses: jetli/trunk-action@v0.4.0
+        with:
+          version: "latest"
+      - name: Setup target
+        run: rustup target add wasm32-unknown-unknown
+      - name: Build | Trunk
+        run: |
+          cd launchers/wasm
+          trunk build --release --public-url ${{ env.PUBLIC_URL }}
+
+      - name: Post Build | Upload dist
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: ./launchers/wasm/dist/
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    outputs:
+      APP_NAME: ${{env.APP_NAME}}
+    steps:
+      - name: Setup | Download dist
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist
+
+      - name: Setup | Place dist
+        run: |
+          cd dist
+          sed -i 's#/main-#./main-#g' index.html
+          sed -i 's#/wasm_#./wasm_#g' index.html
+          find . -type f -exec tar rvf ../${{env.APP_NAME}}-wasm32-unknown-unknown.tar.gz {} \;
+
+      - name: Deploy | Github Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+
+      - name: Release | Upload
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: ${{env.APP_NAME}}-wasm32-unknown-unknown.tar.gz
+          prerelease: ${{ contains(github.ref_name, 'a') }}

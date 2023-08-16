@@ -1,0 +1,13 @@
+[package]
+name = "native_{{crate_name}}"
+version = "0.1.0"
+edition = "2021"
+workspace = "../.."
+
+[features]
+default = []
+inspect = ["game/inspect"]
+
+[dependencies]
+bevy.workspace = true
+game = { path = "../.." }

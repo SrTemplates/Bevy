@@ -1,0 +1,45 @@
+name: Upload to itch io
+
+on:
+  workflow_call:
+    inputs:
+      author:
+        required: true
+        type: string
+      file_name:
+        required: true
+        type: string
+      name:
+        required: true
+        type: string
+      os:
+        required: true
+        type: string
+    secrets:
+      BUTLER_CREDENTIALS:
+        required: true
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup | Download dist
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.file_name }}
+
+      - name: Set Version
+        env:
+          name: ${{ inputs.name }}
+        run: |
+          echo "fixed_name=${name//_/-}" >> $GITHUB_ENV
+          echo "version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
+      # Upload To Itch.io
+      - continue-on-error: ${{ inputs.os == 'html5' }}
+        uses: robpc/itchio-upload-action@v1
+        with:
+          api-key: ${{ secrets.BUTLER_CREDENTIALS }}
+          channel: ${{ inputs.os }}
+          path: ${{ inputs.file_name }}
+          project: ${{ inputs.author }}/${{ env.fixed_name }}
+          version: ${{ env.version }}

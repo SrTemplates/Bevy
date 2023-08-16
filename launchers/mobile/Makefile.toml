@@ -1,0 +1,17 @@
+[config]
+skip_core_tasks = true
+skip_git_env_info = true
+skip_rust_env_info = true
+skip_crate_env_info = true
+
+[tasks.run-mobile]
+env_files = ["../../.env"]
+condition.env_set = ["BUNDLETOOL_PATH", "ANDROID_NDK_ROOT", "JAVA_HOME"]
+script.main = "gradle assembleDebug -p android"
+script.post = "gradle installDebug -p android"
+
+[tasks.release-mobile]
+env_files = ["../../.env"]
+condition.env_set = ["BUNDLETOOL_PATH", "ANDROID_NDK_ROOT", "JAVA_HOME"]
+script.main = "gradle assembleRelease -p android"
+script.post = "adb install android/build/outputs/apk/release/android-release.apk"

@@ -1,0 +1,111 @@
+name: Build
+
+permissions:
+  contents: write
+
+env:
+  APP_NAME: {{crate_name}}
+
+on:
+  workflow_dispatch:
+  push:
+    paths-ignore:
+      - ".github/build.yml"
+      - ".github/build-**.yml"
+      - ".github/release-**.yml"
+      - "**/Makefile.toml"
+      - "README.md"
+    tags:
+      - "*"
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  build_native:
+    needs: ci
+    runs-on: ${{ matrix.os }}
+    outputs:
+      APP_NAME: ${{env.APP_NAME}}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            name: x86_64-unknown-linux-gnu.tar.gz
+            channel: linux
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            name: x86_64-apple-darwin.tar.gz
+            channel: mac
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            name: x86_64-pc-windows-msvc.zip
+            channel: win
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dsherret/rust-toolchain-file@v1
+      - uses: Swatinem/rust-cache@v2
+      - name: Load .env file
+        uses: xom9ikk/dotenv@v2
+      - name: Install dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          export DEBIAN_FRONTED=noninteractive
+          sudo apt-get -qq update
+          sudo apt-get install -y libxdo-dev libasound2-dev libudev-dev pkg-config
+      - name: build release
+        uses: actions-rs/cargo@v1.0.1
+        with:
+          command: build
+          args: --release --workspace --package native --target ${{ matrix.target }}
+
+      - name: Post Build | Prepare artifacts [Windows]
+        if: matrix.os == 'windows-latest'
+        run: |
+          mv target/${{ matrix.target }}/release/native_{{crate_name}}.exe ${{ env.APP_NAME }}.exe
+          7z a ${{ matrix.name }} ${{ env.APP_NAME }}.exe
+          7z a ${{ matrix.name }} assets/
+          mv ${{ matrix.name }} ${{ env.APP_NAME }}-${{ matrix.name }}
+
+      - name: Post Build | Prepare artifacts [-nix]
+        if: matrix.os != 'windows-latest'
+        run: |
+          mv target/${{ matrix.target }}/release/native_{{crate_name}} ${{ env.APP_NAME }}
+          tar cvzf ${{ matrix.name }} assets/ ${{ env.APP_NAME }}
+          mv ${{ matrix.name }} ${{ env.APP_NAME }}-${{ matrix.name }}
+
+      - name: Release | Upload
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ env.APP_NAME }}-${{ matrix.name }}
+          prerelease: ${{ contains(github.ref_name, 'a') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Post Build | Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.APP_NAME }}-${{ matrix.name }}
+          path: ${{ env.APP_NAME }}-${{ matrix.name }}
+
+  upload-itch:
+    needs: build_native
+    secrets: inherit
+    uses: ./.github/workflows/itch.yml
+    strategy:
+      matrix:
+        include:
+          - name: x86_64-unknown-linux-gnu.tar.gz
+            channel: linux
+          - name: x86_64-apple-darwin.tar.gz
+            channel: mac
+          - name: x86_64-pc-windows-msvc.zip
+            channel: win
+    with:
+      author: sergioribera
+      file_name: ${{ needs.build_native.outputs.APP_NAME }}-${{ matrix.name }}
+      name: ${{ needs.build_native.outputs.APP_NAME }}
+      os: ${{ matrix.channel }}
