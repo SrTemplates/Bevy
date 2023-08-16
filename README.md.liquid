@@ -1,0 +1,41 @@
+# {{game_name}}
+
+# Support Platforms
+- Native (MacOs, Linux & Windows)
+- Web (Wasm)
+- Library (Usable in other rust proyects)
+- Mobile
+  - Android
+  - iOS (⚠️ Soon)
+
+# Requirements
+- Rust
+- Cargo
+- [Cargo Make](https://github.com/sagiegurari/cargo-make)
+- [Cargo Generate](https://github.com/cargo-generate/cargo-generate)
+- [Trunk](https://trunkrs.dev) (Optional for web development)
+
+# Configure Github Actions
+- CI: **Not required**
+- CD/Deployment:
+{%- if  platform == "web" -%}
+    - Modify `.github/workflows/release-gh-pages.yml` environment variables
+{%- endif -%}
+    - Configure Key for apk
+
+# Development Guide
+- Edit the `.env` file if you need
+- Edit `src` folder
+- Run `cargo make dev` for run as development mode (Native window)
+- Run `cargo make --list-all-steps` for check all aviable tasks
+
+#### Other CargoMake Tasks
+* **check** - Check all issues, format and code quality
+* **clean** - Clean all target directory
+* **clippy** - Check code quality
+* **default** - Check all issues, format and code quality
+* **dev** - Run native launcher with development configuration
+* **fix-all** - Try fix all clippy and format issues
+* **fix-fmt** - Fix format
+* **fmt** - Check format quality
+* **test** - Check all unit test

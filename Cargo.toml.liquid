@@ -1,0 +1,65 @@
+[package]
+name = "{{crate_name}}"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+resolver = "2"
+members = [
+{%- if platform == "web" -%}
+    "launchers/wasm",
+{%- endif -%}
+{%- if platform == "pc" -%}
+    "launchers/native",
+{%- endif -%}
+{%- if platform == "mobile" -%}
+    "launchers/mobile",
+{%- endif -%}
+{%- if platform == "all" -%}
+    "launchers/wasm",
+    "launchers/native",
+    "launchers/mobile",
+{%- endif -%}
+]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[profile.dev]
+opt-level = 1
+
+[profile.release]
+panic = 'abort'
+codegen-units = 1
+opt-level = 'z'
+lto = true
+
+[workspace.dependencies]
+log = "0.4.19"
+bevy = { version = "0.11", default-features = false, features = [
+    "android_shared_stdcxx",
+    "bevy_asset",
+    "bevy_audio",
+    "bevy_pbr",
+    "bevy_render",
+    "bevy_scene",
+    "bevy_text",
+    "bevy_ui",
+    "bevy_winit",
+    "png",
+    "x11",
+    "zstd",
+    "wav",
+] }
+
+[features]
+default = []
+inspect = ["bevy-inspector-egui"]
+
+[target.'cfg(not(target_family = "wasm"))'.features]
+inspect = ["bevy/dynamic_linking", "bevy-inspector-egui"]
+
+[dependencies]
+bevy.workspace = true
+log.workspace = true
+bevy-inspector-egui = { version = "0.19", optional = true }

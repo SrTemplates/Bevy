@@ -1,0 +1,8 @@
+launchers/*/assets
+launchers/mobile/android/gradle
+launchers/mobile/android/build
+launchers/mobile/android/.gradle
+***/*.jks
+***/dist/
+***/target
+***/Cargo.lock
