@@ -63,8 +63,6 @@ jobs:
       - name: Setup | Place dist
         run: |
           cd dist
-          sed -i 's#/main-#./main-#g' index.html
-          sed -i 's#/wasm_#./wasm_#g' index.html
           find . -type f -exec tar rvf ../${{env.APP_NAME}}-wasm32-unknown-unknown.tar.gz {} \;
 
       - name: Deploy | Github Pages
