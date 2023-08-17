@@ -3,14 +3,14 @@ CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
 CARGO_MAKE_WORKSPACE_EMULATION = true
 CARGO_MAKE_CRATE_WORKSPACE_MEMBERS = [
 {%- if platform == "web" -%}
-    "launchers/wasm",
+    "launchers/wasm"
 {%- endif -%}
 {%- if platform == "pc" -%}
-    "launchers/native",
+    "launchers/native"
 {%- endif -%}
 {%- if platform == "all" -%}
     "launchers/wasm",
-    "launchers/native",
+    "launchers/native"
 {%- endif -%}
 ]
 
@@ -69,12 +69,11 @@ dependencies = [
     "release-native",
     "release-web",
 ]
-
-{%- case platform -%}
-{%- when "web" -%}
+{% case platform %}
+{% when "web" %}
 [tasks.dev]
 run_task.name = "run-web"
-{%- when "pc","all" -%}
+{% when "pc","all" %}
 [tasks.dev]
 run_task.name = "run-native"
-{%- endcase -%}
+{% endcase %}
