@@ -21,6 +21,16 @@ choices = [
     "pc",
 ]
 
+[placeholders.license]
+type = "string"
+prompt = "What licenses will the project have?"
+default = "all"
+choices = [
+    "all",
+    "MIT",
+    "APACHE",
+]
+
 [placeholders.deploy_itch]
 type = "bool"
 prompt = "🕹️ Would you like your project to be uploaded to itchio?"
@@ -45,8 +55,10 @@ pkg_name = { type = "string", prompt = "What will be the name of the package to 
 deploy_play_store = { type = "bool", prompt = "📱 Would you like your project to be uploaded to Google Play Store?", default = false }
 
 [conditional.'platform == "web" || platform == "all"'.placeholders]
-repository_name = { type = "string", prompt = "What is the name of the repository on GitHub? (this is used to display the github page)" }
 deploy_github_pages = { type = "bool", prompt = "Would you like to deploy it on GitHub pages?", default = true }
+
+[conditional.'deploy_github_pages == true'.placeholders]
+repository_name = { type = "string", prompt = "What is the name of the repository on GitHub? (this is used to display the github page)" }
 
 
 #
@@ -81,3 +93,12 @@ ignore = [
 ignore = [
     ".github/workflows/release-gh-pages.yml",
 ]
+
+#
+# License
+#
+[conditional.'license != "MIT" && license != "all"']
+ignore = [ "LICENSE-MIT" ]
+
+[conditional.'license != "APACHE" && license != "all"']
+ignore = [ "LICENSE-APACHE" ]
