@@ -31,6 +31,11 @@ type = "bool"
 prompt = "🕹️ Would you like to deploy it in GitHub releases?"
 default = false
 
+[placeholders.enable_inspector]
+type = "bool"
+prompt = "🕹️ Would you like to activate the inspector interface for development mode?"
+default = false
+
 #
 # Contional Placeholders
 #
@@ -54,6 +59,9 @@ repository_name = { type = "string", prompt = "What is the name of the repositor
 #
 # Conditions
 #
+[conditional.'enable_inspector == true']
+ignore = ["src/inspector.rs", "src/inspector"]
+
 [conditional.'platform != "mobile" && platform != "all"']
 ignore = [".github/workflows/build-android.yml", "launchers/mobile", "res"]
 
