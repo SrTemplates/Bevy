@@ -2,6 +2,15 @@
 name = "{{crate_name}}"
 version = "0.1.0"
 edition = "2021"
+{% if license == "MIT" %}
+license = "MIT"
+{% endif %}
+{% if license == "APACHE" %}
+license = "Apache-2.0"
+{% endif %}
+{% if license == "all" %}
+license = "MIT OR Apache-2.0"
+{% endif %}
 
 [workspace]
 resolver = "2"
