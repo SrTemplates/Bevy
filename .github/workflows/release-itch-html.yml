@@ -15,7 +15,7 @@ on:
 
 env:
   APP_NAME: {{crate_name}}
-
+{% raw %}
 jobs:
   ci:
     uses: ./.github/workflows/ci.yml
@@ -57,13 +57,17 @@ jobs:
         with:
           name: ${{env.APP_NAME}}-wasm32-unknown-unknown.zip
           path: ${{env.APP_NAME}}-wasm32-unknown-unknown.zip
-
+{% endraw %}
+{% if deploy_itch %}
   upload-itch:
-    needs: build
+    needs: build_native
     secrets: inherit
     uses: ./.github/workflows/itch.yml
     with:
-      author: sergioribera
+      author: {{itch_username}}
+      name: {{ itch_project_name }}
+{% raw %}
       file_name: ${{ needs.build.outputs.APP_NAME }}-wasm32-unknown-unknown.zip
-      name: ${{ needs.build.outputs.APP_NAME }}
       os: html5
+{% endraw %}
+{% endif %}

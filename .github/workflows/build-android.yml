@@ -5,7 +5,6 @@ permissions:
 
 env:
   APP_NAME: {{crate_name}}
-  UPLOAD_PLAY_STORE: false
 
 on:
   workflow_dispatch:
@@ -18,7 +17,7 @@ on:
       - "README.md"
     tags:
       - "v*"
-
+{% raw %}
 jobs:
   ci:
     uses: ./.github/workflows/ci.yml
@@ -50,29 +49,48 @@ jobs:
         run: |
           echo "${{ secrets.KEYSTORE_PASSWORD }}" | apksigner sign --ks ${{ env.APP_NAME }}.keystore --ks-key-alias ${{ env.APP_NAME }} ${{ env.APP_NAME }}.apk
           echo "${{ secrets.KEYSTORE_PASSWORD }}" | jarsigner -keystore ${{ env.APP_NAME }}.keystore ${{ env.APP_NAME }}.aab ${{ env.APP_NAME }}
-      # - name: Upload to Playstore
-      #   if: ${{ env.UPLOAD_PLAY_STORE }} == true
-      #   uses: r0adkll/upload-google-play@v1
-      #   with:
-      #     inAppUpdatePriority: 2
-      #     packageName: com.sergioribera.${{ env.APP_NAME }}
-      #     releaseFiles: ${{ env.APP_NAME }}.aab
-      #     serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-      #     track: production
-      #     userFraction: 0.7
-      #     whatsNewDirectory: distribution/whatsnew
       - name: Post Build | Upload Artifact
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.APP_NAME }}.apk
           path: ${{ env.APP_NAME }}.apk
+{% endraw %}
+{% if deploy_play_store %}
+      - name: Upload to Playstore
+        uses: r0adkll/upload-google-play@v1
+        with:
+          inAppUpdatePriority: 2
+          packageName: {{pkg_name}}
+          track: production
+          userFraction: 0.7
+          whatsNewDirectory: distribution/whatsnew
+{% raw %}
+          releaseFiles: ${{ env.APP_NAME }}.aab
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+{% endraw %}
+{% endif %}
+{% if deploy_release %}
+{% raw %}
+      - name: Release | Upload
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ env.APP_NAME }}.apk
+          prerelease: ${{ contains(github.ref_name, 'a') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+{% endraw %}
+{% endif %}
 
+{% if deploy_itch %}
   upload-itch:
-    needs: native_build
+    needs: build_native
     secrets: inherit
     uses: ./.github/workflows/itch.yml
     with:
-      author: sergioribera
+      author: {{itch_username}}
+      name: {{ itch_project_name }}
+{% raw %}
       file_name: ${{ needs.native_build.outputs.APP_NAME }}.apk
-      name: ${{ needs.native_build.outputs.APP_NAME }}
       os: android
+{% endraw %}
+{% endif %}
