@@ -6,7 +6,7 @@ workspace = "../.."
 
 [features]
 default = []
-inspect = ["game/inspect"]
+inspect = ["{{crate_name}}/inspect"]
 
 [dependencies]
 bevy.workspace = true

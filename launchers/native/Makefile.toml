@@ -7,7 +7,6 @@ watch.watch = [
     "../../src",
     "../../assets",
     "../../Cargo.toml",
-    "assets",
     "src",
     "Cargo.toml",
 ]
