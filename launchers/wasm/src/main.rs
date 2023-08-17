@@ -24,5 +24,5 @@ fn main() {
     yew::Renderer::<Root>::new().render();
     // Start the Bevy App
     log::info!("Starting launcher: WASM");
-    game::app(false).run();
+    {{crate_name}}::app(false).run();
 }

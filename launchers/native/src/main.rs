@@ -2,5 +2,5 @@ use bevy::prelude::*;
 
 fn main() {
     info!("Starting launcher: Native");
-    game::app(true).run();
+    {{crate_name}}::app(true).run();
 }
