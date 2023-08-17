@@ -10,4 +10,4 @@ inspect = ["game/inspect"]
 
 [dependencies]
 bevy.workspace = true
-game = { path = "../.." }
+{{crate_name}} = { path = "../.." }

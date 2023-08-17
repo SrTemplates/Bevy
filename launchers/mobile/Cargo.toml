@@ -10,4 +10,4 @@ crate-type = ["staticlib", "cdylib"]
 
 [dependencies]
 bevy.workspace = true
-game.path = "../../"
+{{crate_name}}.path = "../../"
