@@ -14,22 +14,13 @@ prompt = "👾 What will be the name of this game? (For Humans)"
 type = "string"
 prompt = "🖥️ Which platforms we will support?"
 default = "all"
-choices = [
-    "all",
-    "mobile",
-    "web",
-    "pc",
-]
+choices = ["all", "mobile", "web", "pc"]
 
 [placeholders.license]
 type = "string"
 prompt = "What licenses will the project have?"
 default = "all"
-choices = [
-    "all",
-    "MIT",
-    "APACHE",
-]
+choices = ["all", "MIT", "APACHE"]
 
 [placeholders.deploy_itch]
 type = "bool"
@@ -65,40 +56,29 @@ repository_name = { type = "string", prompt = "What is the name of the repositor
 # Conditions
 #
 [conditional.'platform != "mobile" && platform != "all"']
-ignore = [
-    ".github/workflows/build-android.yml",
-    "launchers/mobile",
-    "res"
-]
+ignore = [".github/workflows/build-android.yml", "launchers/mobile", "res"]
 
 [conditional.'platform != "web" && platform != "all"']
 ignore = [
     ".github/workflows/release-gh-pages.yml",
     ".github/workflows/release-itch-html.yml",
-    "launchers/wasm"
+    "launchers/wasm",
 ]
 
 [conditional.'platform != "pc" && platform != "all"']
-ignore = [
-    ".github/workflows/build.yml",
-    "launchers/native"
-]
+ignore = [".github/workflows/build.yml", "launchers/native"]
 
 [conditional.'deploy_itch == false']
-ignore = [
-    ".github/workflows/itch.yml",
-]
+ignore = [".github/workflows/itch.yml"]
 
 [conditional.'deploy_github_pages == false']
-ignore = [
-    ".github/workflows/release-gh-pages.yml",
-]
+ignore = [".github/workflows/release-gh-pages.yml"]
 
 #
 # License
 #
 [conditional.'license != "MIT" && license != "all"']
-ignore = [ "LICENSE-MIT" ]
+ignore = ["LICENSE-MIT"]
 
 [conditional.'license != "APACHE" && license != "all"']
-ignore = [ "LICENSE-APACHE" ]
+ignore = ["LICENSE-APACHE"]
