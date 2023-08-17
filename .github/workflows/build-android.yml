@@ -62,8 +62,6 @@ jobs:
           inAppUpdatePriority: 2
           packageName: {{pkg_name}}
           track: production
-          userFraction: 0.7
-          whatsNewDirectory: distribution/whatsnew
 {% raw %}
           releaseFiles: ${{ env.APP_NAME }}.aab
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
