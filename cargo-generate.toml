@@ -1,15 +1,83 @@
 [template]
 cargo_generate_version = ">=0.9.0"
 exclude = ["*.png", ".github/workflows/ci.yml"]
+ignore = ["README.md"]
 
 [hooks]
 post = ["post-script.rhai"]
 
-[placeholders]
-game_name = { type = "string", prompt = "👾 What will be the name of this game? (For Humans)" }
-platform = { type = "string", prompt = "🖥️ Which platforms we will support?", choices = [
+[placeholders.game_name]
+type = "string"
+prompt = "👾 What will be the name of this game? (For Humans)"
+
+[placeholders.platform]
+type = "string"
+prompt = "🖥️ Which platforms we will support?"
+default = "all"
+choices = [
     "all",
     "mobile",
     "web",
     "pc",
-], default = "all" }
+]
+
+[placeholders.deploy_itch]
+type = "bool"
+prompt = "🕹️ Would you like your project to be uploaded to itchio?"
+default = false
+
+[placeholders.deploy_release]
+type = "bool"
+prompt = "🕹️ Would you like to deploy it in GitHub releases?"
+default = false
+
+#
+# Contional Placeholders
+#
+# Deploy to itch.io
+[conditional.'deploy_itch == true'.placeholders]
+itch_username = { type = "string", prompt = "What is your itch.io username?" }
+itch_project_name = { type = "string", prompt = "What is your itch.io project name?" }
+
+# If has mobile platform
+[conditional.'platform == "mobile" || platform == "all"'.placeholders]
+pkg_name = { type = "string", prompt = "What will be the name of the package to be used in the android project? (ex: com.sergioribera.my_game)" }
+deploy_play_store = { type = "bool", prompt = "📱 Would you like your project to be uploaded to Google Play Store?", default = false }
+
+[conditional.'platform == "web" || platform == "all"'.placeholders]
+repository_name = { type = "string", prompt = "What is the name of the repository on GitHub? (this is used to display the github page)" }
+deploy_github_pages = { type = "bool", prompt = "Would you like to deploy it on GitHub pages?", default = true }
+
+
+#
+# Conditions
+#
+[conditional.'platform != "mobile" && platform != "all"']
+ignore = [
+    ".github/workflows/build-android.yml",
+    "launchers/mobile",
+    "res"
+]
+
+[conditional.'platform != "web" && platform != "all"']
+ignore = [
+    ".github/workflows/release-gh-pages.yml",
+    ".github/workflows/release-itch-html.yml",
+    "launchers/wasm"
+]
+
+[conditional.'platform != "pc" && platform != "all"']
+ignore = [
+    ".github/workflows/build.yml",
+    "launchers/native"
+]
+
+[conditional.'deploy_itch == false']
+ignore = [
+    ".github/workflows/itch.yml",
+]
+
+[conditional.'deploy_github_pages == false']
+ignore = [
+    ".github/workflows/release-gh-pages.yml",
+]
