@@ -15,8 +15,8 @@ on:
 
 env:
   APP_NAME: {{crate_name}}
-  PUBLIC_URL: /replace_that/
-
+  PUBLIC_URL: /{{repository_name}}/
+{% raw %}
 jobs:
   ci:
     uses: ./.github/workflows/ci.yml
@@ -73,6 +73,9 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
 
+{% endraw %}
+{% if deploy_release %}
+{% raw %}
       - name: Release | Upload
         uses: softprops/action-gh-release@v1
         env:
@@ -80,3 +83,5 @@ jobs:
         with:
           files: ${{env.APP_NAME}}-wasm32-unknown-unknown.tar.gz
           prerelease: ${{ contains(github.ref_name, 'a') }}
+{% endraw %}
+{% endif %}

@@ -17,7 +17,7 @@ on:
       - "README.md"
     tags:
       - "*"
-
+{% raw %}
 jobs:
   ci:
     uses: ./.github/workflows/ci.yml
@@ -65,7 +65,7 @@ jobs:
       - name: Post Build | Prepare artifacts [Windows]
         if: matrix.os == 'windows-latest'
         run: |
-          mv target/${{ matrix.target }}/release/native_{{crate_name}}.exe ${{ env.APP_NAME }}.exe
+          mv target/${{ matrix.target }}/release/native_${{ env.APP_NAME }}.exe ${{ env.APP_NAME }}.exe
           7z a ${{ matrix.name }} ${{ env.APP_NAME }}.exe
           7z a ${{ matrix.name }} assets/
           mv ${{ matrix.name }} ${{ env.APP_NAME }}-${{ matrix.name }}
@@ -73,10 +73,17 @@ jobs:
       - name: Post Build | Prepare artifacts [-nix]
         if: matrix.os != 'windows-latest'
         run: |
-          mv target/${{ matrix.target }}/release/native_{{crate_name}} ${{ env.APP_NAME }}
+          mv target/${{ matrix.target }}/release/native_${{ env.APP_NAME }} ${{ env.APP_NAME }}
           tar cvzf ${{ matrix.name }} assets/ ${{ env.APP_NAME }}
           mv ${{ matrix.name }} ${{ env.APP_NAME }}-${{ matrix.name }}
-
+      - name: Post Build | Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.APP_NAME }}-${{ matrix.name }}
+          path: ${{ env.APP_NAME }}-${{ matrix.name }}
+{% endraw %}
+{% if deploy_release %}
+{% raw %}
       - name: Release | Upload
         uses: softprops/action-gh-release@v1
         with:
@@ -84,13 +91,9 @@ jobs:
           prerelease: ${{ contains(github.ref_name, 'a') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Post Build | Upload Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ env.APP_NAME }}-${{ matrix.name }}
-          path: ${{ env.APP_NAME }}-${{ matrix.name }}
-
+{% endraw %}
+{% endif %}
+{% if deploy_itch %}
   upload-itch:
     needs: build_native
     secrets: inherit
@@ -105,7 +108,10 @@ jobs:
           - name: x86_64-pc-windows-msvc.zip
             channel: win
     with:
-      author: sergioribera
+      author: {{itch_username}}
+      name: {{ itch_project_name }}
+{% raw %}
       file_name: ${{ needs.build_native.outputs.APP_NAME }}-${{ matrix.name }}
-      name: ${{ needs.build_native.outputs.APP_NAME }}
       os: ${{ matrix.channel }}
+{% endraw %}
+{% endif %}
