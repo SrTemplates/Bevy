@@ -1,7 +1,6 @@
 [template]
 cargo_generate_version = ">=0.9.0"
-exclude = ["*.png", ".github/workflows/ci.yml"]
-ignore = ["README.md"]
+exclude = ["*.png", ".github/workflows/ci.yml", ".github/workflows/itch.yml"]
 
 [hooks]
 post = ["post-script.rhai"]
