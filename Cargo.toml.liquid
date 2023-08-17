@@ -73,12 +73,23 @@ bevy = { version = "0.11", default-features = false, features = [
 
 [features]
 default = []
-inspect = ["bevy-inspector-egui"]
+inspect = ["bevy-inspector-egui", "egui_dock", "egui-gizmo"]
 
 [target.'cfg(not(target_family = "wasm"))'.features]
-inspect = ["bevy/dynamic_linking", "bevy-inspector-egui"]
+inspect = [
+    "bevy/dynamic_linking",
+    "bevy-inspector-egui",
+    "egui_dock",
+    "egui-gizmo"
+]
 
 [dependencies]
 bevy.workspace = true
 log.workspace = true
 bevy-inspector-egui = { version = "0.19", optional = true }
+
+{% if enable_inspector -%}
+[dev-dependencies]
+egui_dock = { version = "0.6", optional = true }
+egui-gizmo = { version = "0.11", optional = true }
+{%- endif -%}
