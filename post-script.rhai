@@ -12,4 +12,4 @@ if platform == "mobile" || platform == "all" {
     ]);
 }
 
-variable::set("platform", platform);
+file::write(".env", "");
