@@ -41,8 +41,8 @@ default = false
 #
 # Deploy to itch.io
 [conditional.'deploy_itch == true'.placeholders]
-itch_username = { type = "string", prompt = "What is your itch.io username?" }
-itch_project_name = { type = "string", prompt = "What is your itch.io project name?" }
+itch_username = { type = "string", prompt = "What is your itch.io username?", default = "" }
+itch_project_name = { type = "string", prompt = "What is your itch.io project name?", default = "" }
 
 # If has mobile platform
 [conditional.'platform == "mobile" || platform == "all"'.placeholders]
@@ -59,7 +59,7 @@ repository_name = { type = "string", prompt = "What is the name of the repositor
 #
 # Conditions
 #
-[conditional.'enable_inspector == true']
+[conditional.'enable_inspector == false']
 ignore = ["src/inspector.rs", "src/inspector"]
 
 [conditional.'platform != "mobile" && platform != "all"']
