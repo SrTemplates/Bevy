@@ -4,7 +4,29 @@ This template integrates automated generation using charge-generate to make the 
 # Template Features
 - It includes a feature to separate development mode from release mode (`inspect`)
     > [!NOTE]
-    > with this feature the development dependencies are automatically enabled as well as an entity inspector, it is planned to integrate a more complete editor later on.
+    > with this feature the development dependencies are automatically enabled as well as an entity inspector
+- Advanced and Complex Inspector UI
+    - Features:
+        - Console to see logs
+        - Separate Scene View to Game View
+        - Shortcuts
+        - Keyboard and mouse movement Scene camera
+        - Customizable interface
+        - Create Objects with Context Menu
+    - TODO:
+        - Fix flickering Game/Scene View when disable camera
+        - Implement list of assets folder
+        - Prefabs system
+        - Save and Load scenes
+        - Replace [T, S, R, G, L] by cute icons
+        - Add Play/Pause System
+
+    <details>
+        <summary><strong>See Preview</strong></summary>
+        
+    https://github.com/SrTemplates/Bevy/assets/56278796/7a8f4610-e109-491b-9768-3bacf5912767
+  
+    </details>
 -  Support Platforms
     - Native
         - MacOs
