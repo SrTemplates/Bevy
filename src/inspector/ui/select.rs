@@ -2,8 +2,8 @@ use std::any::TypeId;
 
 use bevy::asset::{HandleId, ReflectAsset};
 use bevy::prelude::*;
-use bevy_reflect::TypeRegistry;
 use bevy_egui::egui;
+use bevy_reflect::TypeRegistry;
 
 #[derive(Eq, PartialEq)]
 pub enum InspectorSelection {

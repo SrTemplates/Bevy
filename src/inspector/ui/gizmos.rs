@@ -2,9 +2,17 @@ use bevy::prelude::*;
 use bevy::render::camera::CameraProjection;
 use bevy_egui::egui;
 use bevy_inspector_egui::bevy_inspector::hierarchy::SelectedEntities;
-use egui_gizmo::{GizmoMode, Gizmo, GizmoOrientation};
+use egui_gizmo::{Gizmo, GizmoMode, GizmoOrientation};
 
 use crate::inspector::default_scene::MainSceneCamera;
+
+#[derive(Clone, Copy, Default)]
+pub struct GizmoSnapValues {
+    pub enable: bool,
+    pub distance: f32,
+    pub angle: f32,
+    pub scale: f32,
+}
 
 pub fn draw_gizmo(
     ui: &mut egui::Ui,
@@ -12,6 +20,7 @@ pub fn draw_gizmo(
     selected_entities: &SelectedEntities,
     gizmo_mode: GizmoMode,
     gizmo_orientation: GizmoOrientation,
+    gizmo_snap: GizmoSnapValues,
 ) {
     let (cam_transform, projection) = world
         .query_filtered::<(&GlobalTransform, &Projection), With<MainSceneCamera>>()
@@ -34,6 +43,10 @@ pub fn draw_gizmo(
             .view_matrix(view_matrix.to_cols_array_2d())
             .projection_matrix(projection_matrix.to_cols_array_2d())
             .orientation(gizmo_orientation)
+            .snapping(gizmo_snap.enable && gizmo_snap.distance > 0. && gizmo_snap.angle > 0. && gizmo_snap.scale > 0.)
+            .snap_distance(gizmo_snap.distance)
+            .snap_angle(gizmo_snap.angle)
+            .snap_scale(gizmo_snap.scale)
             .mode(gizmo_mode)
             .interact(ui)
         else {

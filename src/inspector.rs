@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 use bevy_egui::EguiSet;
 use bevy_inspector_egui::DefaultInspectorConfigPlugin;
-use default_scene::{set_camera_viewport, setup as setup_scene};
 use camera_movement::*;
+use default_scene::{set_camera_viewport, setup as setup_scene};
 use inspect_log::*;
 use ui::*;
 
