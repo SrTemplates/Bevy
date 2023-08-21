@@ -11,7 +11,7 @@ use crate::inspector::inspect_log::Logs;
 
 use super::{
     add, draw_console_logs, draw_gizmo, hierarchy_ui, select_asset, select_resource,
-    AddWindowState, InspectorSelection,
+    AddWindowState, GizmoSnapValues, InspectorSelection,
 };
 
 #[derive(Debug)]
@@ -37,6 +37,7 @@ pub struct TabViewer<'a> {
     pub game_render: Option<Handle<Image>>,
     pub game_texture_id: Option<TextureId>,
     pub gizmo_mode: &'a mut GizmoMode,
+    pub gizmo_snap: &'a mut GizmoSnapValues,
     pub gizmo_orientation: &'a mut GizmoOrientation,
     pub filter_level_log: &'a mut log::Level,
     pub exist_game_camera: bool,
@@ -73,6 +74,7 @@ impl egui_dock::TabViewer for TabViewer<'_> {
                     self.selected_entities,
                     *self.gizmo_mode,
                     *self.gizmo_orientation,
+                    *self.gizmo_snap,
                 );
             }
             EguiWindow::GameView => {

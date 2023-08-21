@@ -31,6 +31,7 @@ pub struct UiState {
     pub selected_entities: SelectedEntities,
     pub selection: InspectorSelection,
     pub gizmo_mode: GizmoMode,
+    pub gizmo_snap: GizmoSnapValues,
     pub gizmo_orientation: GizmoOrientation,
     pub hierarchy_state: AddWindowState<'static>,
     pub filter_level_log: log::Level,
@@ -50,6 +51,7 @@ impl UiState {
             scene_rect: &mut self.scene_rect,
             selection: &mut self.selection,
             gizmo_mode: &mut self.gizmo_mode,
+            gizmo_snap: &mut self.gizmo_snap,
             gizmo_orientation: &mut self.gizmo_orientation,
             hierarchy_state: &self.hierarchy_state,
             filter_level_log: &mut self.filter_level_log,
@@ -98,6 +100,7 @@ impl Default for UiState {
             game_texture_id: None,
             filter_level_log: log::max_level().to_level().unwrap_or(log::Level::Trace),
             hierarchy_state: AddWindowState::default(),
+            gizmo_snap: GizmoSnapValues::default(),
             gizmo_mode: GizmoMode::Translate,
             gizmo_orientation: GizmoOrientation::Local,
         }
@@ -215,5 +218,52 @@ fn tools_menu(ui: &mut egui::Ui, tab_viewer: &mut TabViewer) {
     .show(ui)
     {
         *tab_viewer.gizmo_orientation = orientation;
+    }
+
+    ui.add_space(10.);
+
+    {
+        ui.style_mut().visuals.button_frame = false;
+        if ui
+            .add(
+                egui::Button::new("Snap")
+                    .fill(if tab_viewer.gizmo_snap.enable {
+                        egui::Color32::DARK_GRAY
+                    } else {
+                        egui::Color32::TRANSPARENT
+                    })
+                    .min_size(egui::Vec2::splat(18.0))
+                    .rounding(egui::Rounding::none()),
+            )
+            .context_menu(|ui| {
+                ui.horizontal(|ui| {
+                    ui.label("Transform Snap:");
+                    ui.add(
+                        egui::DragValue::new(&mut tab_viewer.gizmo_snap.distance)
+                            .clamp_range(0.0..=std::f32::MAX),
+                    );
+                });
+
+                ui.horizontal(|ui| {
+                    ui.label("Rotation Snap:");
+                    ui.add(
+                        egui::DragValue::new(&mut tab_viewer.gizmo_snap.angle)
+                            .clamp_range(0.0..=360.0)
+                            .suffix(" °"),
+                    );
+                });
+
+                ui.horizontal(|ui| {
+                    ui.label("Scale Snap:");
+                    ui.add(
+                        egui::DragValue::new(&mut tab_viewer.gizmo_snap.scale)
+                            .clamp_range(0.0..=std::f32::MAX),
+                    );
+                });
+            })
+            .clicked()
+        {
+            tab_viewer.gizmo_snap.enable = !tab_viewer.gizmo_snap.enable;
+        }
     }
 }
