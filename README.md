@@ -1,5 +1,5 @@
 # Template for Bevy
-This template integrates automated generation using charge-generate to make the initialization of a project much simpler and less tedious, ideal for anyone who wants to speed up their time.
+This template integrates automated generation using cargo-generate to make the initialization of a project much simpler and less tedious, ideal for anyone who wants to speed up their time.
 
 # Template Features
 - It includes a feature to separate development mode from release mode (`inspect`)
