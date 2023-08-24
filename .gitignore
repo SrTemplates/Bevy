@@ -1,8 +1,10 @@
 .env
 launchers/*/assets
+launchers/mobile/android/.idea
 launchers/mobile/android/gradle
 launchers/mobile/android/build
 launchers/mobile/android/.gradle
+launchers/mobile/android/local.properties
 ***/*.jks
 ***/dist/
 ***/target
