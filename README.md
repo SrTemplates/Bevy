@@ -46,6 +46,7 @@ This template integrates automated generation using cargo-generate to make the i
     - Itch.io
     - Google Play Store
     - Steam (:warning: Planned)
+- Automatic generate `version_name` and `version_code` in android release
 - Separate game logic and launchers
 - Use of `cargo-make` to provide preset tasks which you can see [below](#user-content-other-cargomake-tasks)
     - Just run `cargo make dev` to compile and release a development mode version of the game

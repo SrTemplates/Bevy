@@ -31,26 +31,6 @@ ext.getCustomBuildMode = { ->
     return project.hasProperty("custom_build_mode") ? project.property("custom_build_mode") : false
 }
 
-ext.getExportVersionCode = { ->
-    String versionCode = project.hasProperty("export_version_code") ? project.property("export_version_code") : ""
-    if (versionCode == null || versionCode.isEmpty()) {
-        versionCode = "1"
-    }
-    try {
-        return Integer.parseInt(versionCode)
-    } catch (NumberFormatException ignored) {
-        return 1
-    }
-}
-
-ext.getExportVersionName = { ->
-    String versionName = project.hasProperty("export_version_name") ? project.property("export_version_name") : ""
-    if (versionName == null || versionName.isEmpty()) {
-        versionName = "1.0"
-    }
-    return versionName
-}
-
 ext.getExportMinSdkVersion = { ->
     String minSdkVersion = project.hasProperty("export_version_min_sdk") ? project.property("export_version_min_sdk") : ""
     if (minSdkVersion == null || minSdkVersion.isEmpty()) {

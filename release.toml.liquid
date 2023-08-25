@@ -1,6 +1,16 @@
+{% raw -%}
 allow-branch = ["main", "dev", "!HEAD"]
 publish = false
 pre-release-commit-message = "chore: Release {{crate_name}} version {{version}}"
+{%- endraw -%}
+{% case platform -%}
+{%- when "mobile","all" -%}
+pre-release-hook = ["./launchers/mobile/android/update_version.sh"]
 pre-release-replacements = []
+{%- else -%}
+pre-release-replacements = []
+{%- endcase %}
+{% raw -%}
 tag-message = "chore: Release {{crate_name}} version {{version}}"
 tag-name = "v{{version}}"
+{%- endraw -%}

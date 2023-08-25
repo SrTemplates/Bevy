@@ -39,21 +39,37 @@ android {
         jvmTarget = versions.javaVersion
     }
 
-    defaultConfig {
-        // The default ignore pattern for the "assets" directory includes hidden files and directories which are used by Crossbow projects.
-        aaptOptions {
-            ignoreAssetsPattern "!.svn:!.git:!.gitignore:!.ds_store:!*.scc:<dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"
+    def versionPropsFile = file('version.properties')
+
+    if (versionPropsFile.canRead()) {
+        def Properties versionProps = new Properties()
+
+        versionProps.load(new FileInputStream(versionPropsFile))
+
+        defaultConfig {
+            // The default ignore pattern for the "assets" directory includes hidden files and directories which are used by Crossbow projects.
+            aaptOptions {
+                ignoreAssetsPattern "!.svn:!.git:!.gitignore:!.ds_store:!*.scc:<dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"
+            }
+
+            def versionMajor = versionProps['VERSION_MAJOR'].toInteger()
+            def versionMinor = versionProps['VERSION_MINOR'].toInteger()
+            def versionPatch = versionProps['VERSION_PATCH'].toInteger()
+
+            // Feel free to modify the application id to your own.
+            applicationId getExportPackageName()
+            versionCode versionMajor * 10000 + versionMinor * 100 + versionPatch
+            versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+            minSdkVersion getExportMinSdkVersion()
+            targetSdkVersion getExportTargetSdkVersion()
+
+            missingDimensionStrategy "products", "template"
         }
-
-        // Feel free to modify the application id to your own.
-        applicationId getExportPackageName()
-        versionCode getExportVersionCode()
-        versionName getExportVersionName()
-        minSdkVersion getExportMinSdkVersion()
-        targetSdkVersion getExportTargetSdkVersion()
-
-        missingDimensionStrategy "products", "template"
     }
+    else {
+        throw new GradleException("Could not read version.properties!")
+    }
+
 
     lintOptions {
         abortOnError false
@@ -67,8 +83,6 @@ android {
             assets.srcDirs = ["../../../assets"]
             res.srcDirs = ["../../../res/android"]
         }
-        // debug.jniLibs.srcDirs = ["../libs/debug"]
-        // release.jniLibs.srcDirs = ["../libs/release"]
     }
 }
 
@@ -103,11 +117,6 @@ cargo {
 import org.apache.tools.ant.taskdefs.condition.Os
 
 tasks.whenTaskAdded { task ->
-    if (task.name == 'assembleDebug' || task.name == 'bundleDebug') {
-        cargo.profile = "debug"
-    } else if (task.name == 'assembleRelease' || task.name == 'bundleRelease') {
-        cargo.profile = "release"
-    }
     if (task.name == 'mergeDebugJniLibFolders' || task.name == 'mergeReleaseJniLibFolders') {
         task.dependsOn 'cargoBuild'
     }
