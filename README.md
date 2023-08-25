@@ -66,6 +66,9 @@ This template integrates automated generation using cargo-generate to make the i
 > You need `--allow-commands` to create foders and package
 > It is only mandatory if you do not want to be asked for each command before it is executed, although if you prefer you can leave it unchecked so that when it is executed you can see which command is running and decide whether to accept its execution or not.
 
+> [!NOTE]
+> If you want generate all needed for icons, you can use [this page](https://icon.kitchen)
+
 ```sh
 cargo generate SrTemplates/Bevy
 
