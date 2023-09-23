@@ -1,10 +1,15 @@
+use std::path::PathBuf;
+use std::sync::Mutex;
+
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_egui::egui::{KeyboardShortcut, Modifiers, TextureId};
 use bevy_egui::{egui, EguiContext};
 use bevy_inspector_egui::bevy_inspector::hierarchy::SelectedEntities;
+use bevy_save::WorldSaveableExt;
 use egui_dock::{DockArea, NodeIndex, Tree};
 use egui_gizmo::{GizmoMode, GizmoOrientation};
+use once_cell::sync::Lazy;
 
 pub use add::*;
 pub use gizmos::*;
@@ -13,12 +18,19 @@ pub use select::*;
 pub use tab_viewer::*;
 pub use widgets::*;
 
+use crate::inspector::scene::load_scene;
+
+use super::scene::save_scene;
+
 mod add;
 mod gizmos;
 mod hierarchy;
 mod select;
 mod tab_viewer;
 mod widgets;
+
+// TODO: get last scene
+pub static CURR_PATH: Lazy<Mutex<Option<PathBuf>>> = Lazy::new(|| Mutex::new(None));
 
 #[derive(Resource)]
 pub struct UiState {
@@ -60,7 +72,9 @@ impl UiState {
         egui::CentralPanel::default()
             .frame(egui::Frame::central_panel(&ctx.style()).inner_margin(0.))
             .show(ctx, |ui| {
-                egui::menu::bar(ui, |ui| file_menu_button(ui, &mut self.tree));
+                egui::menu::bar(ui, |ui| {
+                    file_menu_button(ui, &mut tab_viewer, &mut self.tree)
+                });
                 ui.horizontal(|ui| tools_menu(ui, &mut tab_viewer));
 
                 DockArea::new(&mut self.tree).show_inside(ui, &mut tab_viewer);
@@ -121,12 +135,19 @@ pub fn show_ui_system(world: &mut World) {
     });
 }
 
-fn file_menu_button(ui: &mut egui::Ui, tree: &mut Tree<EguiWindow>) {
+fn file_menu_button(ui: &mut egui::Ui, viwer: &mut TabViewer, tree: &mut Tree<EguiWindow>) {
     let save_shortcut = egui::KeyboardShortcut::new(egui::Modifiers::CTRL, egui::Key::S);
+    let save_as_shortcut =
+        egui::KeyboardShortcut::new(egui::Modifiers::CTRL | egui::Modifiers::SHIFT, egui::Key::S);
+    let undo_shortcut = egui::KeyboardShortcut::new(egui::Modifiers::CTRL, egui::Key::Z);
+    let redo_shortcut =
+        egui::KeyboardShortcut::new(egui::Modifiers::CTRL | egui::Modifiers::SHIFT, egui::Key::Z);
+    let load_shortcut = egui::KeyboardShortcut::new(egui::Modifiers::CTRL, egui::Key::O);
 
     ui.menu_button("File", |ui| {
         ui.set_min_width(220.0);
         ui.style_mut().wrap = Some(false);
+        let mut curr_path = CURR_PATH.lock().unwrap();
 
         if ui
             .add(
@@ -135,8 +156,63 @@ fn file_menu_button(ui: &mut egui::Ui, tree: &mut Tree<EguiWindow>) {
             )
             .clicked()
         {
-            // TODO: open file explorer if not have file.scn.ron
-            log::info!("Scene Saved!");
+            if save_scene(&mut curr_path, &mut viwer.world) {
+                log::info!("Scene Saved!");
+            } else {
+                log::error!("Failed to Save Scene!");
+            }
+            ui.close_menu();
+        }
+        if ui
+            .add(
+                egui::Button::new("Save Scene As")
+                    .shortcut_text(ui.ctx().format_shortcut(&save_as_shortcut)),
+            )
+            .clicked()
+        {
+            *curr_path = None;
+            if save_scene(&mut curr_path, &mut viwer.world) {
+                log::info!("Scene Saved!");
+            } else {
+                log::error!("Failed to Save Scene!");
+            }
+            ui.close_menu();
+        }
+        if ui
+            .add(
+                egui::Button::new("Load Scene")
+                    .shortcut_text(ui.ctx().format_shortcut(&load_shortcut)),
+            )
+            .clicked()
+        {
+            if let Some(path) = load_scene(&mut viwer.world) {
+                *curr_path = Some(path);
+            }
+            ui.close_menu();
+        }
+        // TODO: make automatic checkpoint
+        if ui
+            .add(
+                egui::Button::new("Undo (Not implemented)")
+                    .shortcut_text(ui.ctx().format_shortcut(&undo_shortcut)),
+            )
+            .clicked()
+        {
+            if let Err(e) = viwer.world.rollback(1) {
+                log::warn!("Undo failed! {e:?}");
+            }
+            ui.close_menu();
+        }
+        if ui
+            .add(
+                egui::Button::new("Redo (Not implemented)")
+                    .shortcut_text(ui.ctx().format_shortcut(&redo_shortcut)),
+            )
+            .clicked()
+        {
+            if let Err(e) = viwer.world.rollback(-1) {
+                log::warn!("Redo failed! {e:?}");
+            }
             ui.close_menu();
         }
     });

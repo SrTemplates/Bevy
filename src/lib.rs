@@ -1,0 +1,77 @@
+use bevy::{log::LogPlugin, prelude::*, window::WindowMode};
+
+#[cfg(feature = "inspect")]
+mod inspector;
+
+pub const LAUNCHER_TITLE: &str = "Test";
+
+//
+// App library entrypoint from launchers
+//
+pub fn app(fullscreen: bool) -> App {
+    let mode = if fullscreen {
+        WindowMode::BorderlessFullscreen
+    } else {
+        WindowMode::Windowed
+    };
+
+    let mut app = App::new();
+    app.add_plugins(
+        DefaultPlugins
+            .set(WindowPlugin {
+                primary_window: Some(Window {
+                    mode,
+                    title: LAUNCHER_TITLE.to_string(),
+                    fit_canvas_to_parent: true,
+                    prevent_default_event_handling: true,
+                    present_mode: bevy::window::PresentMode::AutoVsync,
+                    decorations: false,
+                    ..default()
+                }),
+                ..default()
+            })
+            .disable::<LogPlugin>(),
+    );
+#[cfg(feature = "inspect")]
+    app.add_plugins(inspector::InspectorPlugin);
+
+    // Setup Game
+    app.add_systems(Startup, setup);
+    app
+}
+
+pub fn setup(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    log::trace!("Setup Game Camera");
+
+    // camera
+    commands.spawn((
+        Camera3dBundle {
+            transform: Transform::from_translation(Vec3::new(0., 3., 10.))
+                .with_rotation(Quat::from_rotation_x(-0.2)),
+            ..default()
+        },
+        #[cfg(feature = "inspect")]
+        inspector::MainGameCamera,
+    ));
+    // cube
+    commands.spawn(PbrBundle {
+        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+        material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
+        transform: Transform::from_xyz(0.0, 0.5, 0.0),
+        ..default()
+    });
+    // light
+    commands.spawn(PointLightBundle {
+        point_light: PointLight {
+            intensity: 1500.0,
+            shadows_enabled: true,
+            ..default()
+        },
+        transform: Transform::from_xyz(4.0, 8.0, 4.0),
+        ..default()
+    });
+}
