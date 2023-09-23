@@ -13,13 +13,15 @@ This template integrates automated generation using cargo-generate to make the i
         - Keyboard and mouse movement Scene camera
         - Customizable interface
         - Create Objects with Context Menu
+        - WIP: Save and Load Scenes using
     - TODO:
         - Fix flickering Game/Scene View when disable camera
         - Implement list of assets folder
         - Prefabs system
-        - Save and Load scenes
         - Replace [T, S, R, G, L] by cute icons
         - Add Play/Pause System
+        - Undo/Redo system
+        - Scene parent/children entity support
 
     <details>
         <summary><strong>See Preview</strong></summary>
