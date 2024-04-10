@@ -58,6 +58,7 @@ This template integrates automated generation using cargo-generate to make the i
 - Cargo
 - [Cargo Generate](https://github.com/cargo-generate/cargo-generate)
 - [Cargo Make](https://github.com/sagiegurari/cargo-make) (Optional)
+    - [Mold](https://github.com/rui314/mold?tab=readme-ov-file)
 - [Cargo Release](https://github.com/crate-ci/cargo-release) (Optional)
 - [Trunk](https://trunkrs.dev) (Optional for web development)
 
