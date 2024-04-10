@@ -19,11 +19,16 @@ choices = ["all", "mobile", "web", "pc"]
 type = "string"
 prompt = "What licenses will the project have?"
 default = "all"
-choices = ["all", "MIT", "APACHE"]
+choices = ["all", "MIT", "APACHE", "none"]
+
+[placeholders.deploy_steam]
+type = "bool"
+prompt = "Would you like your project to be uploaded to Steam?"
+default = false
 
 [placeholders.deploy_itch]
 type = "bool"
-prompt = "Would you like your project to be uploaded to itchio?"
+prompt = "Would you like your project to be uploaded to itch.io?"
 default = false
 
 [placeholders.deploy_release]
@@ -39,6 +44,11 @@ default = false
 #
 # Contional Placeholders
 #
+
+# Deploy to Steam
+[conditional.'deploy_steam == true'.placeholders]
+steam_appid = { type = "string", prompt = "What is your Steam AppId?", default = "" }
+
 # Deploy to itch.io
 [conditional.'deploy_itch == true'.placeholders]
 itch_username = { type = "string", prompt = "What is your itch.io username?", default = "" }
