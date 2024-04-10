@@ -41,6 +41,9 @@ pub fn app(fullscreen: bool) -> App {
     // Setup Game
     app.add_systems(Startup, setup);
 {%- endif %}
+{%- if deploy_steam %}
+    app.add_plugins(SteamworksPlugin::init_app({{steam_appid}}).unwrap());
+{%- endif -%}
     app
 }
 
